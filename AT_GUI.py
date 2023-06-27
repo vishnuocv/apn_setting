@@ -28,19 +28,19 @@ window_y = (screen_height - window_height) // 2
 window.geometry(f"{window_width}x{window_height}+{window_x}+{window_y}")
 
 # Create the APN entry field
-apn_lbl = tk.Label(text='APN')
+apn_lbl = tk.Label(text='Access point name')
 apn_lbl.pack()
 apn_entry = tk.Entry(window, width=50, font=('Arial', 12))
 apn_entry.pack(pady=5)
 
 # Create the IP type entry field
-ip_lbl = tk.Label(text='IP TYPE')
+ip_lbl = tk.Label(text='IP TYPE (IPV4, IPV6 or IPV4V6)')
 ip_lbl.pack()
 ip_entry = tk.Entry(window, width=50, font=('Arial', 12))
 ip_entry.pack(pady=5)
 
 # Create the Authentication entry field
-auth_lbl = tk.Label(text='Authentication')
+auth_lbl = tk.Label(text='Authentication (CHAP, PAP or CHAP/PAP)')
 auth_lbl.pack()
 auth_entry = tk.Entry(window, width=50, font=('Arial', 12))
 auth_entry.pack(pady=5)
