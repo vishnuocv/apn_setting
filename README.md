@@ -1,8 +1,12 @@
 # apn_setting
 
-Install Python3
+# Install the following:
 
-install tkinter (apt install python-tk)
+Python3 (apt install python3)
+tkinter (apt install python-tk)
+python-is-python3 (apt install python-is-python3)
 
-run:
+
+# run using following command:
+
 python AT_GUI.py
