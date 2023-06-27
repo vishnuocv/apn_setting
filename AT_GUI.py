@@ -54,6 +54,7 @@ pass_entry.pack()
 
 # Create the "Send" button
 send_button = tk.Button(window, text="Set", command=send_at_command)
+send_button.place(x=280, y=120)
 send_button.pack()
 
 exit_button = tk.Button(window, text = "Exit",
@@ -64,6 +65,8 @@ exit_button.pack()
 output_text = tk.Text(window)
 output_text.config(bg='#A67449')
 output_text.pack()
+
+output_text.insert(tk.END, "Please Enter APN details in the text box")
 
 # Run the application
 window.mainloop()
