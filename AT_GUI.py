@@ -29,25 +29,25 @@ apn_entry.pack()
 
 # Create the AT command entry field
 ip_lbl = tk.Label(text='IP TYPE')
-ip_lbl.place(x=190, y=23)
+ip_lbl.place(x=190, y=25)
 ip_entry = tk.Entry(window)
 ip_entry.pack()
 
 # Create the AT command entry field
 auth_lbl = tk.Label(text='Authentication')
-auth_lbl.place(x=130, y=48)
+auth_lbl.place(x=142, y=49)
 auth_entry = tk.Entry(window)
 auth_entry.pack()
 
 # Create the AT command entry field
 user_lbl = tk.Label(text='User name')
-user_lbl.place(x=160, y=69)
+user_lbl.place(x=165, y=71)
 user_entry = tk.Entry(window)
 user_entry.pack()
 
 # Create the AT command entry field
 pass_lbl = tk.Label(text='Password')
-pass_lbl.place(x=160, y=90)
+pass_lbl.place(x=175, y=94)
 pass_entry = tk.Entry(window)
 pass_entry.pack()
 
