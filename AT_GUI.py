@@ -1,5 +1,5 @@
-import subprocess
 import tkinter as tk
+import subprocess
 
 def send_at_command():
     apn_name = apn_entry.get()
@@ -15,59 +15,61 @@ def send_at_command():
     output_text.insert(tk.END, command)
     output_text.insert(tk.END, result.stderr)
 
-# Create the main window
 window = tk.Tk()
-window.config(bg='#84BF04')
-window.minsize(600,400)
-window.title("Internet/Attach APN setter")
+window.title("APN Setter GUI")
 
-# Create the AT command entry field
+# Adjusting the window size and position
+screen_width = window.winfo_screenwidth()
+screen_height = window.winfo_screenheight()
+window_width = 700
+window_height = 500
+window_x = (screen_width - window_width) // 2
+window_y = (screen_height - window_height) // 2
+window.geometry(f"{window_width}x{window_height}+{window_x}+{window_y}")
+
+# Create the APN entry field
 apn_lbl = tk.Label(text='APN')
-apn_lbl.place(x=210, y=3)
-apn_entry = tk.Entry(window)
-apn_entry.pack()
+apn_lbl.pack()
+apn_entry = tk.Entry(window, width=50, font=('Arial', 12))
+apn_entry.pack(pady=5)
 
-# Create the AT command entry field
+# Create the IP type entry field
 ip_lbl = tk.Label(text='IP TYPE')
-ip_lbl.place(x=190, y=25)
-ip_entry = tk.Entry(window)
-ip_entry.pack()
+ip_lbl.pack()
+ip_entry = tk.Entry(window, width=50, font=('Arial', 12))
+ip_entry.pack(pady=5)
 
-# Create the AT command entry field
+# Create the Authentication entry field
 auth_lbl = tk.Label(text='Authentication')
-auth_lbl.place(x=142, y=49)
-auth_entry = tk.Entry(window)
-auth_entry.pack()
+auth_lbl.pack()
+auth_entry = tk.Entry(window, width=50, font=('Arial', 12))
+auth_entry.pack(pady=5)
 
-# Create the AT command entry field
+# Create the User name entry field
 user_lbl = tk.Label(text='User name')
-user_lbl.place(x=165, y=71)
-user_entry = tk.Entry(window)
-user_entry.pack()
+user_lbl.pack()
+user_entry = tk.Entry(window, width=50, font=('Arial', 12))
+user_entry.pack(pady=5)
 
-# Create the AT command entry field
+# Create the Password entry field
 pass_lbl = tk.Label(text='Password')
-pass_lbl.place(x=175, y=94)
-pass_entry = tk.Entry(window)
-pass_entry.pack()
+pass_lbl.pack()
+pass_entry = tk.Entry(window, width=50, font=('Arial', 12))
+pass_entry.pack(pady=5)
 
+button = tk.Button(window, text="Set APN", width=20, bg='#ffffff', activebackground='#00ff00', command=send_at_command)
+button.pack(pady=10)
 
-# Create the "Send" button
-send_button = tk.Button(window, text="Set", command=send_at_command)
-send_button.place(x=280, y=120)
-send_button.pack()
-
-exit_button = tk.Button(window, text = "Exit",
+exit_button = tk.Button(window, text = "Quit", width=20, bg='#ffffff', activebackground='red',
             command = window.destroy)
-exit_button.pack()
+exit_button.pack(pady=15)
 
 # Create the output text box
 output_text = tk.Text(window)
 output_text.config(bg='#A67449')
-output_text.pack()
+output_text.pack(pady=15)
 
 output_text.insert(tk.END, "Please Enter APN details in the text box")
 
-# Run the application
 window.mainloop()
 
