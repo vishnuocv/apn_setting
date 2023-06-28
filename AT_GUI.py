@@ -6,8 +6,6 @@ def mmcli_port_checker():
     mmcli_port = mmcli_port_check.rfind("/")
     mmcli_port_number = mmcli_port_check[mmcli_port + 1:].strip()
     port = mmcli_port_number.split()
-    if len(port) > 0:
-    	first_word = port[0]
     return port[0]	
 
 def send_at_command():
