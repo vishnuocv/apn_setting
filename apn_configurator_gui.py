@@ -1,23 +1,34 @@
 import tkinter as tk
 import subprocess
+from tkinter import messagebox
 
 def create_or_modify_mobile_broadband_profile(profile_name, apn, ip_type, username, password, authentication):
     # Check if the profile already exists
     result = subprocess.run(["nmcli", "-t", "-f", "NAME", "c", "show"], capture_output=True, text=True)
     existing_profiles = result.stdout.splitlines()
     if profile_name in existing_profiles:
-        # Modify the existing profile
-        subprocess.run(["nmcli", "c", "modify", profile_name, "gsm.apn", apn])
-        subprocess.run(["nmcli", "c", "modify", profile_name, "gsm.username", username])
-        subprocess.run(["nmcli", "c", "modify", profile_name, "gsm.password", password])
-        print("Mobile broadband profile modified successfully.")
+        # Display alert window for confirmation
+        response = messagebox.askyesno("Profile Exists", "The profile already exists. Do you want to modify it?")
+
+        if response:
+
+            # Modify the existing profile
+            subprocess.run(["nmcli", "c", "modify", profile_name, "gsm.apn", apn])
+            subprocess.run(["nmcli", "c", "modify", profile_name, "gsm.username", username])
+            subprocess.run(["nmcli", "c", "modify", profile_name, "gsm.password", password])
+            output_text.insert(tk.END, "Mobile broadband profile modified successfully.")
+
+        else:
+            output_text.insert(tk.END, "Modification of the existing profile canceled.")
+            return
+
     else:
         # Create a new profile
         subprocess.run(["nmcli", "c", "add", "type", "gsm", "ifname", "none", "con-name", profile_name])
         subprocess.run(["nmcli", "c", "modify", profile_name, "gsm.apn", apn])
         subprocess.run(["nmcli", "c", "modify", profile_name, "gsm.username", username])
         subprocess.run(["nmcli", "c", "modify", profile_name, "gsm.password", password])
-        print("Mobile broadband profile created successfully.")
+        output_text.insert(tk.END, "Mobile broadband profile created successfully.")
 
     # Configure authentication options based on the selected method
     if authentication.lower() in ["pap"]:
