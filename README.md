@@ -3,7 +3,7 @@
 # Install the following:
 
 Python3 (apt install python3)
-tkinter (apt install python-tk)
+tkinter (apt install python-tk python3-tk)
 python-is-python3 (apt install python-is-python3)
 
 
