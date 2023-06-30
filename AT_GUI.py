@@ -50,7 +50,7 @@ def create_or_modify_mobile_broadband_profile(profile_name, apn, ip_type, userna
 
 
     # Bring up the mobile broadband connection
-    result = subprocess.run(["nmcli", "con", "up", profile_name])
+    result = subprocess.run(["nmcli", "con", "up", profile_name], capture_output=True, text=True)
     if result==0:
         print("Mobile broadband connection is up.")
     else: 
