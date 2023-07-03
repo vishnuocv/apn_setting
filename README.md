@@ -1,4 +1,6 @@
-# apn_setting
+# apn_Configurator_GUI
+
+GUI helps user to configure APN's for Networks which uses Attach APN.
 
 # Install the following:
 
