@@ -104,7 +104,7 @@ def send_at_command():
 
 
 window = tk.Tk()
-window.title("APN Setter GUI")
+window.title("APN Configurator GUI")
 
 # Adjusting the window size and position
 screen_width = window.winfo_screenwidth()
@@ -122,7 +122,7 @@ profile_entry = tk.Entry(window, width=50, font=('Arial', 12))
 profile_entry.pack(pady=6)
 
 # Create the APN entry field
-apn_lbl = tk.Label(text='Access point name', font=('Arial', 12))
+apn_lbl = tk.Label(text='Access point name (APN)', font=('Arial', 12))
 apn_lbl.pack()
 apn_entry = tk.Entry(window, width=50, font=('Arial', 12))
 apn_entry.pack(pady=6)
@@ -152,10 +152,10 @@ pass_entry = tk.Entry(window, width=50, font=('Arial', 12))
 pass_entry.pack(pady=6)
 
 
-button = tk.Button(window, text="Set APN and Connect", font=('Arial', 12), width=20, bg='#ffffff', activebackground='#00ff00', command=send_at_command)
+button = tk.Button(window, text="Set APN / Connect", font=('Arial', 12), width=20, bg='#ffffff', activebackground='#00ff00', command=send_at_command)
 button.pack(pady=15)
 
-exit_button = tk.Button(window, text = "Quit", font=('Arial', 12), width=20, bg='#ffffff', activebackground='red',
+exit_button = tk.Button(window, text = "Exit", font=('Arial', 12), width=20, bg='#ffffff', activebackground='red',
             command = window.destroy)
 exit_button.pack(pady=15)
 
@@ -164,6 +164,6 @@ output_text = tk.Text(window)
 output_text.config(bg='#A67449')
 output_text.pack(pady=15)
 
-output_text.insert(tk.END, "Please Enter APN details in the text box")
+output_text.insert(tk.END, "Please Enter your APN details in the text box")
 
 window.mainloop()
