@@ -2,6 +2,12 @@ import tkinter as tk
 import subprocess
 from tkinter import messagebox
 
+def switch_on_mobile_broadband():
+    subprocess.run(["nmcli", "radio", "wwan", "on"])
+
+def refresh_network_manager_settings():
+    subprocess.run(["nmcli", "connection", "reload"])
+
 def create_or_modify_mobile_broadband_profile(profile_name, apn, ip_type, username, password, authentication):
     # Check if the profile already exists
     result = subprocess.run(["nmcli", "-t", "-f", "NAME", "c", "show"], capture_output=True, text=True)
@@ -59,6 +65,14 @@ def create_or_modify_mobile_broadband_profile(profile_name, apn, ip_type, userna
         subprocess.run(["nmcli", "c", "modify", profile_name, "ipv4.method", "auto"])
         subprocess.run(["nmcli", "c", "modify", profile_name, "ipv6.method", "auto"])
 
+
+    # Refresh Network Manager settings
+    refresh_network_manager_settings()
+    print("Network Manager settings refreshed.")
+
+    # Switch on the mobile broadband connection
+    switch_on_mobile_broadband()
+    print("Mobile broadband is switched on.")
 
     # Bring up the mobile broadband connection
     result = subprocess.run(["nmcli", "con", "up", profile_name], capture_output=True, text=True)
