@@ -74,8 +74,13 @@ def create_or_modify_mobile_broadband_profile(profile_name, apn, ip_type, userna
     switch_on_mobile_broadband()
     print("Mobile broadband is switched on.")
 
+    # Modify the connection type based on the device type
+    device_type = "wwan"
+    subprocess.run(["nmcli", "c", "modify", profile_name, "connection.type", device_type])
+    
     # Bring up the mobile broadband connection
-    result = subprocess.run(["nmcli", "con", "up", profile_name], capture_output=True, text=True)
+    result = subprocess.run(["nmcli", "c", "up", profile_name], capture_output=True, text=True)
+
     if result==0:
         print("Mobile broadband connection is up.")
     else: 
