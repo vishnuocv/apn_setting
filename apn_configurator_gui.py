@@ -1,6 +1,12 @@
+import os
+import stat
 import tkinter as tk
 import subprocess
 from tkinter import messagebox
+
+# Global variables for authentication and IP type
+authentication = ""
+ip_type = ""
 
 def switch_on_mobile_broadband():
     subprocess.run(["nmcli", "radio", "wwan", "on"])
@@ -8,35 +14,72 @@ def switch_on_mobile_broadband():
 def refresh_network_manager_settings():
     subprocess.run(["nmcli", "connection", "reload"])
 
-def create_or_modify_mobile_broadband_profile(profile_name, apn, ip_type, username, password, authentication):
-    # Check if the profile already exists
-    result = subprocess.run(["nmcli", "-t", "-f", "NAME", "c", "show"], capture_output=True, text=True)
-    existing_profiles = result.stdout.splitlines()
-    if profile_name in existing_profiles:
-        # Display alert window for confirmation
-        response = messagebox.askyesno("Profile Exists", "The profile already exists. Do you want to modify it?")
+def restart_network_manager():
+    subprocess.run(["sudo", "systemctl", "restart", "NetworkManager"])
 
-        if response:
+# Function to create or modify the mobile broadband profile
+def create_or_modify_mobile_broadband_profile_nm(profile_name, apn, ip_type, username, password, authentication):
 
-            # Modify the existing profile
-            subprocess.run(["nmcli", "c", "modify", profile_name, "gsm.apn", apn])
-            subprocess.run(["nmcli", "c", "modify", profile_name, "gsm.username", username])
-            subprocess.run(["nmcli", "c", "modify", profile_name, "gsm.password", password])
-            output_text.insert(tk.END, "Mobile broadband profile modified successfully.")
+    # Create a new connection profile file
+    connection_file_path = f"/etc/NetworkManager/system-connections/{profile_name}"
+    with open(connection_file_path, 'w') as connection_file:
+        connection_file.write("[connection]\n")
+        connection_file.write("id=" + profile_name + "\n")
+        connection_file.write("type=gsm\n")
+        connection_file.write("autoconnect=true\n")
+        connection_file.write("\n")
+        connection_file.write("[gsm]\n")
+        connection_file.write("apn=" + apn + "\n")
+        connection_file.write("username=" + username + "\n")
+        connection_file.write("password=" + password + "\n")
+        connection_file.write("ip-type=" + ip_type + "\n")
+        connection_file.write("allowed-auth=" + authentication + "\n")
 
-        else:
-            output_text.insert(tk.END, "Modification of the existing profile canceled.")
-            return
+    # Set the correct permissions on the connection file
+    os.chmod(connection_file_path, stat.S_IRUSR | stat.S_IWUSR)
 
+    # Refresh Network Manager settings
+    refresh_network_manager_settings()
+    print("Network Manager settings refreshed.")
+
+    restart_network_manager()
+    print("Network Manager restarted.")
+
+    # Switch on the mobile broadband connection
+    switch_on_mobile_broadband()
+    print("Mobile broadband is switched on.")
+
+def on_checkbox_change():
+    global authentication, ip_type
+
+    ip_type = ""
+    if ipv4_var.get() and ipv6_var.get():
+        ip_type = "IPV4V6"
+    elif ipv4_var.get():
+        ip_type = "IPV4"
+    elif ipv6_var.get():
+        ip_type = "IPV6"
+
+    authentication = ""
+    if pap_var.get() and chap_var.get():
+        authentication = "PAP/CHAP"
     else:
-        # Create a new profile
-        subprocess.run(["nmcli", "c", "add", "type", "gsm", "ifname", "none", "con-name", profile_name])
-        subprocess.run(["nmcli", "c", "modify", profile_name, "gsm.apn", apn])
-        subprocess.run(["nmcli", "c", "modify", profile_name, "gsm.username", username])
-        subprocess.run(["nmcli", "c", "modify", profile_name, "gsm.password", password])
-        output_text.insert(tk.END, "Mobile broadband profile created successfully.")
+        if pap_var.get():
+            authentication = "PAP"
+        if chap_var.get():
+            if authentication:
+                authentication += "/"
+            authentication += "CHAP"
+            
+def modify_mobile_broadband_profile(profile_name, apn, ip_type, username, password, authentication):
+
+    subprocess.run(["nmcli", "c", "modify", profile_name, "gsm.apn", apn])
+    subprocess.run(["nmcli", "c", "modify", profile_name, "gsm.username", username])
+    subprocess.run(["nmcli", "c", "modify", profile_name, "gsm.password", password])
+    output_text.insert(tk.END, "Mobile broadband profile created successfully.")
 
     # Configure authentication options based on the selected method
+
     if authentication.lower() in ["pap"]:
         subprocess.run(["nmcli", "c", "modify", profile_name, "ppp.refuse-eap", "yes"])
         subprocess.run(["nmcli", "c", "modify", profile_name, "ppp.refuse-chap", "yes"])
@@ -65,31 +108,6 @@ def create_or_modify_mobile_broadband_profile(profile_name, apn, ip_type, userna
         subprocess.run(["nmcli", "c", "modify", profile_name, "ipv4.method", "auto"])
         subprocess.run(["nmcli", "c", "modify", profile_name, "ipv6.method", "auto"])
 
-
-    # Refresh Network Manager settings
-    refresh_network_manager_settings()
-    print("Network Manager settings refreshed.")
-
-    # Switch on the mobile broadband connection
-    switch_on_mobile_broadband()
-    print("Mobile broadband is switched on.")
-
-    # Modify the connection type based on the device type
-    device_type = "wwan"
-    subprocess.run(["nmcli", "c", "modify", profile_name, "connection.type", device_type])
-    
-    # Bring up the mobile broadband connection
-    result = subprocess.run(["nmcli", "c", "up", profile_name], capture_output=True, text=True)
-
-    if result==0:
-        print("Mobile broadband connection is up.")
-    else: 
-        print("Mobile broadband connection is not up. Either modem is not detected or driver is not up")
-
-    output_text.insert(tk.END, result.stdout)
-    output_text.insert(tk.END, result.stderr)
-
-
 def mmcli_port_checker():
     mmcli_port_check = subprocess.check_output(['mmcli', '-L']).decode('utf-8')
     mmcli_port = mmcli_port_check.rfind("/")
@@ -98,11 +116,11 @@ def mmcli_port_checker():
     return port[0]	
 
 def send_at_command():
+    global authentication, ip_type
     #filling variables from textbox
     profile_name = profile_entry.get()
     apn_name = apn_entry.get()
-    ip_type = ip_entry.get()
-    auth_type = auth_entry.get()
+    auth_type = authentication
     user_name = user_entry.get()
     password = pass_entry.get()
 
@@ -117,9 +135,11 @@ def send_at_command():
     output_text.insert(tk.END, result.stdout)
     output_text.insert(tk.END, result.stderr)
 
-    #setting values in Network manager and calling connect
-    create_or_modify_mobile_broadband_profile(profile_name, apn_name, ip_type, user_name, password, auth_type)
+    #setting values for Network manager GUI
+    create_or_modify_mobile_broadband_profile_nm(profile_name, apn_name, ip_type, user_name, password, auth_type)
 
+    #setting values in Network manager nmcli method
+    modify_mobile_broadband_profile(profile_name, apn_name, ip_type, user_name, password, auth_type)
 
 
 window = tk.Tk()
@@ -128,7 +148,7 @@ window.title("APN Configurator GUI")
 # Adjusting the window size and position
 screen_width = window.winfo_screenwidth()
 screen_height = window.winfo_screenheight()
-window_width = 650
+window_width = 700
 window_height = 700
 window_x = (screen_width - window_width) // 2
 window_y = (screen_height - window_height) // 2
@@ -146,17 +166,23 @@ apn_lbl.pack()
 apn_entry = tk.Entry(window, width=50, font=('Arial', 12))
 apn_entry.pack(pady=6)
 
-# Create the IP type entry field
-ip_lbl = tk.Label(text='IP TYPE (IPV4, IPV6 or IPV4V6)', font=('Arial', 12))
-ip_lbl.pack()
-ip_entry = tk.Entry(window, width=50, font=('Arial', 12))
-ip_entry.pack(pady=6)
+# Create the IP type checkboxes
+ipv4_var = tk.BooleanVar()
+ipv4_checkbox = tk.Checkbutton(window, text="IPv4", variable=ipv4_var, font=('Arial', 12))
+ipv4_checkbox.pack()
 
-# Create the Authentication entry field
-auth_lbl = tk.Label(text='Authentication (CHAP, PAP or CHAP/PAP)', font=('Arial', 12))
-auth_lbl.pack()
-auth_entry = tk.Entry(window, width=50, font=('Arial', 12))
-auth_entry.pack(pady=6)
+ipv6_var = tk.BooleanVar()
+ipv6_checkbox = tk.Checkbutton(window, text="IPv6", variable=ipv6_var, font=('Arial', 12))
+ipv6_checkbox.pack()
+
+# Create the authentication checkboxes
+pap_var = tk.BooleanVar()
+pap_checkbox = tk.Checkbutton(window, text="PAP", variable=pap_var, font=('Arial', 12))
+pap_checkbox.pack()
+
+chap_var = tk.BooleanVar()
+chap_checkbox = tk.Checkbutton(window, text="CHAP", variable=chap_var, font=('Arial', 12))
+chap_checkbox.pack()
 
 # Create the User name entry field
 user_lbl = tk.Label(text='User name  (if any)', font=('Arial', 12))
@@ -170,6 +196,10 @@ pass_lbl.pack()
 pass_entry = tk.Entry(window, width=50, font=('Arial', 12))
 pass_entry.pack(pady=6)
 
+ipv4_var.trace("w", lambda *args: on_checkbox_change())
+ipv6_var.trace("w", lambda *args: on_checkbox_change())
+pap_var.trace("w", lambda *args: on_checkbox_change())
+chap_var.trace("w", lambda *args: on_checkbox_change())
 
 button = tk.Button(window, text="Set APN / Connect", font=('Arial', 12), width=20, bg='#ffffff', activebackground='#00ff00', command=send_at_command)
 button.pack(pady=15)
