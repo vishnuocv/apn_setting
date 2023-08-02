@@ -133,7 +133,7 @@ def send_at_command():
     output_text.insert(tk.END, "Port detected is " + port_number + '\n')
     result = subprocess.run(['mmcli', '-m', port_number, command], capture_output=True, text=True)
     output_text.insert(tk.END, result.stdout)
-    output_text.insert(tk.END, result.stderr)
+#    output_text.insert(tk.END, result.stderr)
 
     #setting values for Network manager GUI
     create_or_modify_mobile_broadband_profile_nm(profile_name, apn_name, ip_type, user_name, password, auth_type)
