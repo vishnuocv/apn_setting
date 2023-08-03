@@ -2,6 +2,7 @@ import os
 import stat
 import tkinter as tk
 import subprocess
+import uuid
 from tkinter import messagebox
 
 # Global variables for authentication and IP type
@@ -20,18 +21,23 @@ def restart_network_manager():
 # Function to create or modify the mobile broadband profile
 def create_or_modify_mobile_broadband_profile_nm(profile_name, apn, ip_type, username, password, authentication):
 
+    new_uuid = str(uuid.uuid4()) # generating new UUID
+
     # Create a new connection profile file
     connection_file_path = f"/etc/NetworkManager/system-connections/{profile_name}"
     with open(connection_file_path, 'w') as connection_file:
         connection_file.write("[connection]\n")
         connection_file.write("id=" + profile_name + "\n")
+        connection_file.write("uuid=" + new_uuid + "\n")  # Set the generated UUID
         connection_file.write("type=gsm\n")
         connection_file.write("autoconnect=true\n")
         connection_file.write("\n")
         connection_file.write("[gsm]\n")
         connection_file.write("apn=" + apn + "\n")
-        connection_file.write("username=" + username + "\n")
-        connection_file.write("password=" + password + "\n")
+        if username:
+            connection_file.write("username=" + username + "\n")
+        if password:
+            connection_file.write("password=" + password + "\n")
         connection_file.write("ip-type=" + ip_type + "\n")
         connection_file.write("allowed-auth=" + authentication + "\n")
 
