@@ -30,7 +30,7 @@ def create_or_modify_mobile_broadband_profile_nm(profile_name, apn, ip_type, use
         connection_file.write("id=" + profile_name + "\n")
         connection_file.write("uuid=" + new_uuid + "\n")  # Set the generated UUID
         connection_file.write("type=gsm\n")
-        connection_file.write("autoconnect=true\n")
+#        connection_file.write("autoconnect=true\n")
         connection_file.write("\n")
         connection_file.write("[gsm]\n")
         connection_file.write("apn=" + apn + "\n")
